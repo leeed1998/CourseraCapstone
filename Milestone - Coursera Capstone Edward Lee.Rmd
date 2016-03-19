@@ -1,0 +1,114 @@
+---
+title: "Coursera Capstone Milestone Project"
+author: "Edward Lee"
+date: "March 18, 2016"
+output: html_document
+---
+
+## Setting the Libraries and Path
+This is from reading the forum and performing EDA on the dataset
+```{r Setup, results="hide",echo = FALSE}
+library(knitr)
+library(stringi)
+library(ggplot2)
+library(tm)
+library(wordcloud)
+library(SnowballC) # Needed for tm and wordcloud
+```
+
+## Now let's start by reading in the file for the project
+```{r reading in lines, results="hide"}
+twits <- readLines("final/en_US/en_US.twitter.txt", encoding="UTF-8")
+blogs <- readLines("final/en_US/en_US.blogs.txt", encoding="UTF-8")
+
+# The news file did not have an end of line character - found this on the forum
+newstemp <-file("final/en_US/en_US.news.txt", open="rb")
+news <- readLines(newstemp, encoding="UTF-8")
+close(newstemp)
+rm(newstemp)
+```
+
+## Basic EDA and 5% sampling
+File Size, Number of Sentences, word Counts
+
+```{r EDA}
+# what are the sizes for the files - I have it in Windows so I can check, but will do it the hard way as well
+file.info("final/en_US/en_US.blogs.txt")$size
+file.info("final/en_US/en_US.twitter.txt")$size
+file.info("final/en_US/en_US.news.txt")$size
+# About 250 megabits each
+
+# let's count each line and count how many records are in each line - Using stringi!!!
+stri_stats_general(blogs)
+stri_stats_general(twits)
+stri_stats_general(news)
+
+# We can start with a 5% sample, that should be enough - will do rough estimate from output above
+sblog <- sample(blogs,size=45000)
+stwits <- sample(twits,size=110000)
+snews <- sample(news,size=51000)
+
+# since the blog and news are in paragraphs, I will like to parse it out to sentences.  
+# for the twits, it was screwing up the tm lowercase function adding a step
+sblogsSentences <- strsplit( sblog, "[.]|[!]|[?]")
+snewsSentences <- strsplit( snews, "[.]|[!]|[?]")
+stwits <- sapply(stwits,function(row) iconv(row, "latin1", "ASCII", sub=""))
+
+```
+OK, so we do not have any empty lines ,that's good.
+For twitter, we can see that the max character per twit of 144 is confirmed
+So I will split the sentences in the News and Blog but left the twitter data alone
+
+### Word Frequency Check and WordCloud (because WordCloud looks cool)
+Need to dump the data into a Corpus
+I saw some of the other students had stopword and stem word removed.  Not sure if that is a good idea.  So I will NOT use them
+```{r Corpus}
+# Blogs first
+bcorpus <- VCorpus(VectorSource(sblogsSentences))
+
+bcorpus1 <- tm_map(bcorpus, removePunctuation)
+bcorpus2 <- tm_map(bcorpus1, removeNumbers)
+bcorpus3 <- tm_map(bcorpus2, content_transformer(tolower))
+
+# News 
+ncorpus <- VCorpus(VectorSource(snewsSentences))
+
+ncorpus1 <- tm_map(ncorpus, removePunctuation)
+ncorpus2 <- tm_map(ncorpus1, removeNumbers)
+ncorpus3 <- tm_map(ncorpus2, content_transformer(tolower))
+
+# Twits - yes,this should have been a function.... but it is on my R script!
+tcorpus <- VCorpus(VectorSource(stwits))
+
+tcorpus1 <- tm_map(tcorpus, removePunctuation)
+tcorpus2 <- tm_map(tcorpus1, removeNumbers)
+tcorpus3 <- tm_map(tcorpus2, content_transformer(tolower))
+```
+## Show The Word Cloud
+```{r Blog Cloud}
+wordcloud(bcorpus3, scale=c(3,0.5),
+          min.freq=5, max.words=150, random.order=TRUE,
+          rot.per=0.5, use.r.layout=FALSE,
+          colors=brewer.pal(8, "Dark2"))
+
+wordcloud(ncorpus3, scale=c(3,0.5),
+          min.freq=5, max.words=150, random.order=TRUE,
+          rot.per=0.5, use.r.layout=FALSE,
+          colors=brewer.pal(8, "Dark2"))
+
+wordcloud(tcorpus3, scale=c(3,0.5),
+          min.freq=5, max.words=150, random.order=TRUE,
+          rot.per=0.5, use.r.layout=FALSE,
+          colors=brewer.pal(8, "Dark2"))
+```
+
+***
+## We see the usual suspects in the most common word for all 3 types of text block
+
+### So I will do the following for further analysis
+1. No profanities filter - I like it this way... and it seems people don't curse that much
+2. No stemming or stopwords, we are trying to predict the next word, all is fair
+3. Combine the 3 types of blog, news and twits into one file for model building.
+4. That's it for now
+
+
