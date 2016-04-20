@@ -43,10 +43,10 @@ The Application residing on the Shiny server works in the following steps:
 There are issues and decision made when creating the model, such as
 
 - The model cannot be too big, otherwise, the load time on the Shiny app will take a long time making the app difficult to use
--- So the Corpus of the initial modeling data had to be sampled (10% sample) - balance between a great predictor with slow performance, or a good predictor with faster performance
--- Decided to have only up to 5grams, again, for speed purposes
--- Stem Words were purposely left in the model as they are absolutely necessary.  Different stems will have different follow up words.
--- Curse words were left in as well as I wanted to see how vulgar people can be. It turns out the general public are not as vulgar as one would think.  This renews my faith in humanity
++ So the Corpus of the initial modeling data had to be sampled (10% sample) - balance between a great predictor with slow performance, or a good predictor with faster performance
++ Decided to have only up to 5grams, again, for speed purposes
+- Stem Words were purposely left in the model as they are absolutely necessary.  Different stems will have different follow up words.
+- Curse words were left in as well as I wanted to see how vulgar people can be. It turns out the general public are not as vulgar as one would think.  This renews my faith in humanity
 
 ## Future Updates
 
