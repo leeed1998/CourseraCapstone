@@ -1,7 +1,7 @@
 ---
 title: "Zotar - Predictor of the Future"
-subtitle: "... at least the next word"
-author: "Edward Lee"
+subtitle: "... at least the next word that you may type"
+author: "Edward Lee - Coursera Capstone"
 date: "April 20, 2016"
 output: slidy_presentation
 ---
@@ -10,43 +10,43 @@ output: slidy_presentation
 
 Zotar is a web app that will predict the next word one would type.
 
-The method is based on using current words and phases in the websphere as training data for the predictive alogirthm for making the best guess at the next word following a sequence of input words
+The method is based on using current words and phases in the websphere as training data for the predictive alogirthm that makes the best guess at the next word following a sequence of input words
 
-Zotar The Word Predictor is the result of the Capstone Project for the John Hopkins Coursera Data Science Specialization in partnership with Swiftkey.  The input was provided by Swiftkey for this application
+Zotar The Word Predictor is the result of the Capstone Project for the John Hopkins Coursera Data Science Specialization in partnership with Swiftkey.  The input datasets was provided by Swiftkey and JHU for this application
 
 The Zotar product itself can be accessed at:
 
 https://leeed1998.shinyapps.io/CapstoneProject
 
-## Algorithm Methodology
+## Algorithm Creation
 
 Zotar was created in the following steps:
 
-- Training data using Blogs, News articles and twits were provided by JHU and Swiftkey
+- Training data using Blogs, News articles and Twits were provided by JHU and Swiftkey
 - Cran R using text mining functions to parse through the above data to create Ngram datasets
-- The Ngram datasets were then used as the foundation to perform word prediction
-- R Shiny was used a the web front end for the word prediction application
+- The Ngram datasets were translated the Term Document Matrix dataframes which are used as the foundation to perform word prediction
+- R Shiny was used a the web front end for the word prediction application using the Term Document Matrix dataframes
 
 ## Logic for the Algorithm
 
 The Application residing on the Shiny server works in the following steps:
 
 - Ngram dataset created from the R modeling process at loaded on the public server
-- Ngram dataset consist of bigrams, trigrams, quadgrams, as well as 5grams.   I had a 6 grams model but decide to conserve load time by now using it
+- Ngram dataset consist of bigrams, trigrams, quadgrams, as well as 5grams.   I had a 6 grams model but decide to conserve load time by NOT using it
 - The algorithm that parses the input phase and matches against the different Ngram datasets
 - The prediction algorithm is the backoff Markov chain.  Starting with the 5grams model to find a match
-- If no match at the 5grams model, then move to the quadgrams model... and so forth
-- The first matched model will be considered the best model and the most frequent word will be the "best" word
+- If no match at the 5grams model, the app then moves to the quadgrams model to find a match... and so forth
+- The first matched model will be considered the best model and the most frequent word from the model will be the "best" word
 
 ## Nuisances for the model
 
-There are issues and decision made when creating the model, such as
+There are issues and decisions made when creating the model, such as
 
-- The model cannot be too big, otherwise, the load time on the Shiny app will take a long time making the app difficult to use
+* The model cannot be too big, otherwise, the load time on the Shiny app will take a long time making the app difficult to use
 + So the Corpus of the initial modeling data had to be sampled (10% sample) - balance between a great predictor with slow performance, or a good predictor with faster performance
 + Decided to have only up to 5grams, again, for speed purposes
-- Stem Words were purposely left in the model as they are absolutely necessary.  Different stems will have different follow up words.
-- Curse words were left in as well as I wanted to see how vulgar people can be. It turns out the general public are not as vulgar as one would think.  This renews my faith in humanity
+* Stem Words were purposely left in the model as they are absolutely necessary.  Different stems will have different follow up words.
+* Curse words were left in as well as I wanted to see how vulgar people can be. It turns out the general public are not as vulgar as one would think.  This renews my faith in humanity
 
 ## Future Updates
 
