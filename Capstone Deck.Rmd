@@ -6,33 +6,52 @@ date: "April 20, 2016"
 output: slidy_presentation
 ---
 
-```
+## Summary for The Zotar Word Predictor
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
+Zotar is a web app that will predict the next word one would type.
 
-## R Markdown
+The method is based on using current words and phases in the websphere as training data for the predictive alogirthm for making the best guess at the next word following a sequence of input words
 
-This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Zotar The Word Predictor is the result of the Capstone Project for the John Hopkins Coursera Data Science Specialization in partnership with Swiftkey.  The input was provided by Swiftkey for this application
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+The Zotar product itself can be accessed at:
 
-## Slide with Bullets
+https://leeed1998.shinyapps.io/CapstoneProject
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
+## Algorithm Methodology
 
-## Slide with R Output
+Zotar was created in the following steps:
 
-```{r cars, echo = TRUE}
-summary(cars)
-```
+- Training data using Blogs, News articles and twits were provided by JHU and Swiftkey
+- Cran R using text mining functions to parse through the above data to create Ngram datasets
+- The Ngram datasets were then used as the foundation to perform word prediction
+- R Shiny was used a the web front end for the word prediction application
 
-## Slide with Plot
+## Logic for the Algorithm
 
-```{r pressure}
-plot(pressure)
-```
+The Application residing on the Shiny server works in the following steps:
 
+- Ngram dataset created from the R modeling process at loaded on the public server
+- Ngram dataset consist of bigrams, trigrams, quadgrams, as well as 5grams.   I had a 6 grams model but decide to conserve load time by now using it
+- The algorithm that parses the input phase and matches against the different Ngram datasets
+- The prediction algorithm is the backoff Markov chain.  Starting with the 5grams model to find a match
+- If no match at the 5grams model, then move to the quadgrams model... and so forth
+- The first matched model will be considered the best model and the most frequent word will be the "best" word
+
+## Nuisances for the model
+
+There are issues and decision made when creating the model, such as
+
+- The model cannot be too big, otherwise, the load time on the Shiny app will take a long time making the app difficult to use
+-- So the Corpus of the initial modeling data had to be sampled (10% sample) - balance between a great predictor with slow performance, or a good predictor with faster performance
+-- Decided to have only up to 5grams, again, for speed purposes
+-- Stem Words were purposely left in the model as they are absolutely necessary.  Different stems will have different follow up words.
+-- Curse words were left in as well as I wanted to see how vulgar people can be. It turns out the general public are not as vulgar as one would think.  This renews my faith in humanity
+
+## Future Updates
+
+What else will make Zota predict better
+
+- As the network and PC speed increases, we can use a larger Ngram models
+- The data training set should be refreshed every couple of year to reflect and capture the slow but certain societal language evolution
+- Perhaps Zota can have a regional geo subdivision to reflect a local region's vernacular and slangs
